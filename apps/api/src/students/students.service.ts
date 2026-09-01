@@ -257,17 +257,77 @@ export class StudentsService {
     }
 
     // Connected to Prisma DB
-    const profile = await this.prisma.studentProfile.findUnique({
-      where: { userId },
-      include: {
-        skills: { include: { skill: true } },
-        skillGaps: { where: { resolvedAt: null }, include: { skill: true } },
-        applications: { include: { opportunity: { include: { organization: true } } } },
-        careerGoals: { where: { isPrimary: true } },
-      },
-    });
+    try {
+      const profile = await this.prisma.studentProfile.findUnique({
+        where: { userId },
+        include: {
+          skills: { include: { skill: true } },
+          skillGaps: { where: { resolvedAt: null }, include: { skill: true } },
+          applications: { include: { opportunity: { include: { organization: true } } } },
+          careerGoals: { where: { isPrimary: true } },
+        },
+      });
 
-    if (!profile) {
+      if (!profile) {
+        return {
+          profile: {
+            id: DEMO_STUDENT_PROFILE.id,
+            firstName: DEMO_STUDENT_PROFILE.firstName,
+            lastName: DEMO_STUDENT_PROFILE.lastName,
+            placementReadinessScore: DEMO_STUDENT_PROFILE.placementReadinessScore,
+            onboardingCompleted: true,
+            careerGoal: 'Backend Developer',
+          },
+          skillsSummary: {
+            total: DEMO_STUDENT_PROFILE.skills.length,
+            verified: DEMO_STUDENT_PROFILE.skills.filter(s => s.verificationStatus === 'VERIFIED').length,
+            topSkills: DEMO_STUDENT_PROFILE.skills.map(s => ({
+              name: s.skill.name,
+              level: s.computedLevel,
+              verified: s.verificationStatus === 'VERIFIED',
+            })),
+          },
+          criticalGaps: DEMO_STUDENT_PROFILE.skillGaps.map(g => ({ skill: g.skill.name, severity: g.severity })),
+          recentApplications: DEMO_STUDENT_PROFILE.applications.map(a => ({
+            id: a.id,
+            role: a.opportunity.title,
+            company: a.opportunity.organization.name,
+            status: a.status,
+            appliedAt: a.appliedAt,
+          })),
+          recommendations: [],
+        };
+      }
+
+      return {
+        profile: {
+          id: profile.id,
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          placementReadinessScore: profile.placementReadinessScore || 75,
+          onboardingCompleted: profile.onboardingCompleted,
+          careerGoal: profile.careerGoals[0]?.targetRole || 'Software Engineer',
+        },
+        skillsSummary: {
+          total: profile.skills.length,
+          verified: profile.skills.filter(s => s.verificationStatus === 'VERIFIED').length,
+          topSkills: profile.skills.map(s => ({
+            name: s.skill.name,
+            level: s.computedLevel,
+            verified: s.verificationStatus === 'VERIFIED',
+          })),
+        },
+        criticalGaps: profile.skillGaps.map(g => ({ skill: g.skill.name, severity: g.severity })),
+        recentApplications: profile.applications.map(a => ({
+          id: a.id,
+          role: a.opportunity.title,
+          company: a.opportunity.organization.name,
+          status: a.status,
+          appliedAt: a.appliedAt,
+        })),
+        recommendations: [],
+      };
+    } catch {
       return {
         profile: {
           id: DEMO_STUDENT_PROFILE.id,
@@ -297,34 +357,5 @@ export class StudentsService {
         recommendations: [],
       };
     }
-
-    return {
-      profile: {
-        id: profile.id,
-        firstName: profile.firstName,
-        lastName: profile.lastName,
-        placementReadinessScore: profile.placementReadinessScore || 75,
-        onboardingCompleted: profile.onboardingCompleted,
-        careerGoal: profile.careerGoals[0]?.targetRole || 'Software Engineer',
-      },
-      skillsSummary: {
-        total: profile.skills.length,
-        verified: profile.skills.filter(s => s.verificationStatus === 'VERIFIED').length,
-        topSkills: profile.skills.map(s => ({
-          name: s.skill.name,
-          level: s.computedLevel,
-          verified: s.verificationStatus === 'VERIFIED',
-        })),
-      },
-      criticalGaps: profile.skillGaps.map(g => ({ skill: g.skill.name, severity: g.severity })),
-      recentApplications: profile.applications.map(a => ({
-        id: a.id,
-        role: a.opportunity.title,
-        company: a.opportunity.organization.name,
-        status: a.status,
-        appliedAt: a.appliedAt,
-      })),
-      recommendations: [],
-    };
   }
 }

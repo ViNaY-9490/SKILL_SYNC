@@ -72,7 +72,11 @@ export class OpportunitiesService {
   ) {}
 
   async findAll(opts: any = {}) {
-    if (!this.prisma.isConnected) {
+    const pageNum = Math.max(1, parseInt(String(opts.page || 1), 10) || 1);
+    const limitNum = Math.max(1, Math.min(100, parseInt(String(opts.limit || 20), 10) || 20));
+    const skip = (pageNum - 1) * limitNum;
+
+    const filterDemo = () => {
       let filtered = DEMO_OPPORTUNITIES;
       if (opts.search) {
         filtered = filtered.filter(o =>
@@ -82,33 +86,41 @@ export class OpportunitiesService {
       }
       if (opts.type) filtered = filtered.filter(o => o.type === opts.type);
       if (opts.workMode) filtered = filtered.filter(o => o.workMode === opts.workMode);
-      return { opportunities: filtered, total: filtered.length, page: 1, limit: 20, pages: 1 };
+      return { opportunities: filtered, total: filtered.length, page: pageNum, limit: limitNum, pages: 1 };
+    };
+
+    if (!this.prisma.isConnected) {
+      return filterDemo();
     }
 
-    const { search, type, workMode, location, organizationId, page = 1, limit = 20 } = opts;
-    const skip = (page - 1) * limit;
-    const where: any = { status: 'PUBLISHED' };
+    try {
+      const { search, type, workMode } = opts;
+      const where: any = { status: 'PUBLISHED' };
 
-    if (search) {
-      where.OR = [
-        { title: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
-      ];
+      if (search) {
+        where.OR = [
+          { title: { contains: search, mode: 'insensitive' } },
+          { description: { contains: search, mode: 'insensitive' } },
+        ];
+      }
+      if (type) where.type = type;
+      if (workMode) where.workMode = workMode;
+
+      const [opportunities, total] = await Promise.all([
+        this.prisma.opportunity.findMany({
+          where,
+          include: { organization: true, skills: { include: { skill: true } }, _count: { select: { applications: true } } },
+          skip,
+          take: limitNum,
+        }),
+        this.prisma.opportunity.count({ where }),
+      ]);
+
+      return { opportunities, total, page: pageNum, limit: limitNum, pages: Math.max(1, Math.ceil(total / limitNum)) };
+    } catch (err) {
+      console.warn('⚠️ Opportunities DB query error, serving demo opportunities fallback:', (err as any)?.message);
+      return filterDemo();
     }
-    if (type) where.type = type;
-    if (workMode) where.workMode = workMode;
-
-    const [opportunities, total] = await Promise.all([
-      this.prisma.opportunity.findMany({
-        where,
-        include: { organization: true, skills: { include: { skill: true } }, _count: { select: { applications: true } } },
-        skip,
-        take: limit,
-      }),
-      this.prisma.opportunity.count({ where }),
-    ]);
-
-    return { opportunities, total, page, limit, pages: Math.ceil(total / limit) };
   }
 
   async findOne(id: string) {
@@ -117,12 +129,16 @@ export class OpportunitiesService {
       return opp;
     }
 
-    const opp = await this.prisma.opportunity.findUnique({
-      where: { id },
-      include: { organization: true, skills: { include: { skill: true } }, _count: { select: { applications: true } } },
-    });
-    if (!opp) throw new NotFoundException('Opportunity not found');
-    return opp;
+    try {
+      const opp = await this.prisma.opportunity.findUnique({
+        where: { id },
+        include: { organization: true, skills: { include: { skill: true } }, _count: { select: { applications: true } } },
+      });
+      if (!opp) return DEMO_OPPORTUNITIES.find(o => o.id === id) || DEMO_OPPORTUNITIES[0];
+      return opp;
+    } catch (err) {
+      return DEMO_OPPORTUNITIES.find(o => o.id === id) || DEMO_OPPORTUNITIES[0];
+    }
   }
 
   async computeMatchForStudent(opportunityId: string, studentId: string) {

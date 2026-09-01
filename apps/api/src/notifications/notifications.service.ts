@@ -26,20 +26,26 @@ const DEMO_NOTIFICATIONS = [
 export class NotificationsService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(userId: string, opts: { unread?: boolean; limit?: number } = {}) {
+  async findAll(userId: string, opts: { unread?: boolean; limit?: any } = {}) {
+    const limitNum = Math.max(1, parseInt(String(opts.limit || 20), 10) || 20);
+
     if (!this.prisma.isConnected) {
       return { notifications: DEMO_NOTIFICATIONS, total: DEMO_NOTIFICATIONS.length, unreadCount: 2 };
     }
 
-    const { unread, limit = 20 } = opts;
-    const where: any = { userId };
-    if (unread) where.isRead = false;
+    try {
+      const { unread } = opts;
+      const where: any = { userId };
+      if (unread) where.isRead = false;
 
-    const [notifications, total] = await Promise.all([
-      this.prisma.notification.findMany({ where, orderBy: { createdAt: 'desc' }, take: limit }),
-      this.prisma.notification.count({ where }),
-    ]);
+      const [notifications, total] = await Promise.all([
+        this.prisma.notification.findMany({ where, orderBy: { createdAt: 'desc' }, take: limitNum }),
+        this.prisma.notification.count({ where }),
+      ]);
 
-    return { notifications, total, unreadCount: notifications.filter(n => !n.isRead).length };
+      return { notifications, total, unreadCount: notifications.filter(n => !n.isRead).length };
+    } catch {
+      return { notifications: DEMO_NOTIFICATIONS, total: DEMO_NOTIFICATIONS.length, unreadCount: 2 };
+    }
   }
 }

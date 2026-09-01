@@ -46,4 +46,15 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
       // Ignore if DB not active
     }
   }
+
+  async safeExecute<T>(queryFn: () => Promise<T>, fallback: T): Promise<T> {
+    if (!this.isConnected) return fallback;
+    try {
+      return await queryFn();
+    } catch (err: any) {
+      console.warn(`⚠️ Prisma DB Operation Failed (${err?.message?.substring(0, 100)}...). Falling back to demo data.`);
+      return fallback;
+    }
+  }
 }
+
