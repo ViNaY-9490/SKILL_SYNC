@@ -1,0 +1,32 @@
+{
+  "name": "skillsync-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Academia–Industry Skill Intelligence Platform",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npx concurrently \"npm run dev --workspace=apps/api\" \"npm run dev --workspace=apps/web\" --names \"API,WEB\" --prefix-colors \"blue,green\"",
+    "build": "npm run build --workspace=packages/database && npm run build --workspace=apps/api && npm run build --workspace=apps/web",
+    "typecheck": "npm run typecheck --workspace=apps/api && npm run typecheck --workspace=apps/web",
+    "lint": "npm run lint --workspace=apps/api && npm run lint --workspace=apps/web",
+    "test": "npm run test --workspace=apps/api",
+    "db:migrate": "npm run migrate --workspace=packages/database",
+    "db:seed": "npm run seed --workspace=packages/database",
+    "db:studio": "npm run studio --workspace=packages/database",
+    "db:reset": "npm run reset --workspace=packages/database",
+    "infra:up": "docker compose up -d",
+    "infra:down": "docker compose down",
+    "setup": "npm install && npm run infra:up && npm run db:migrate && npm run db:seed"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}

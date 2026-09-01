@@ -1,0 +1,212 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   INSTITUTIONAL SKILL INTELLIGENCE DESIGN SYSTEM
+   Palette:
+   Primary Dark: #173F35
+   Deep Ink: #17231F
+   Secondary Green: #256B58
+   Warm Ivory: #F7F5EF
+   Paper: #FCFBF7
+   Sage: #A7BDAF
+   Saffron Accent: #E38B32
+   Terracotta: #B9674B
+   Slate Muted: #58645F
+   Border Warm: #DDE2DC
+   ============================================================ */
+
+:root {
+  /* Surfaces */
+  --surface-bg:       #F7F5EF;
+  --surface-paper:    #FCFBF7;
+  --surface-card:     #FFFFFF;
+  --surface-subtle:   #F0EDE6;
+  --surface-dark:     #173F35;
+  --surface-ink:      #17231F;
+
+  /* Text */
+  --text-primary:     #17231F;
+  --text-secondary:   #58645F;
+  --text-tertiary:    #829189;
+  --text-inverse:     #FCFBF7;
+  --text-brand:       #173F35;
+
+  /* Brand & Accents */
+  --primary-dark:     #173F35;
+  --primary-green:    #256B58;
+  --accent-saffron:   #E38B32;
+  --accent-terracotta:#B9674B;
+  --sage-muted:       #A7BDAF;
+
+  /* Borders & Dividers */
+  --border-warm:      #DDE2DC;
+  --border-subtle:    #EBEFEA;
+  --border-dark:      #2A594D;
+
+  /* Shadows (Subtle, Restrained) */
+  --shadow-sm: 0 1px 2px rgba(23, 35, 31, 0.04);
+  --shadow-md: 0 4px 16px rgba(23, 35, 31, 0.06);
+  --shadow-lg: 0 12px 32px rgba(23, 35, 31, 0.08);
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+}
+
+.dark {
+  --surface-bg:       #0B120F;
+  --surface-paper:    #121D19;
+  --surface-card:     #162420;
+  --surface-subtle:   #1E312B;
+  --surface-dark:     #0D241E;
+  --surface-ink:      #080E0C;
+
+  --text-primary:     #F3F7F4;
+  --text-secondary:   #B8CFC2;
+  --text-tertiary:    #829E8E;
+  --text-inverse:     #121D19;
+  --text-brand:       #34D399;
+
+  --primary-dark:     #10B981;
+  --primary-green:    #34D399;
+  --accent-saffron:   #F59E0B;
+  --accent-terracotta:#F87171;
+  --sage-muted:       #4B6B5D;
+
+  --border-warm:      #263E36;
+  --border-subtle:    #1B2E28;
+  --border-dark:      #34D399;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.5);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.6), 0 0 15px rgba(52, 211, 153, 0.05);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.7), 0 0 30px rgba(52, 211, 153, 0.08);
+}
+
+/* ============================================================
+   BASE STYLES & TYPOGRAPHY
+   ============================================================ */
+body {
+  background-color: var(--surface-bg);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Editorial Heading Scales */
+.text-display {
+  font-size: clamp(2.25rem, 4vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: var(--text-primary);
+}
+
+.text-h1 {
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.text-h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.text-h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text-primary);
+}
+
+/* ============================================================
+   PREMIUM SURFACES, CARDS & MICRO-ANIMATIONS
+   ============================================================ */
+.surface-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-warm);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.surface-card:hover {
+  border-color: var(--primary-green);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.surface-paper {
+  background: var(--surface-paper);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Restrained card utility replacement */
+.card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-warm);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card:hover {
+  border-color: var(--primary-green);
+  box-shadow: var(--shadow-md);
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-warm);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-green);
+}
+
+/* Shimmer Skeleton */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--surface-subtle) 25%, var(--surface-bg) 50%, var(--surface-subtle) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease infinite;
+  border-radius: var(--radius-sm);
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
