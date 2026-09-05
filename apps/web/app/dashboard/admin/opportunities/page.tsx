@@ -6,13 +6,19 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 
 export default function AdminOpportunitiesPage() {
-  const { data: opportunities } = useQuery({
+  const { data: rawData } = useQuery({
     queryKey: ['admin-opportunities'],
     queryFn: async () => {
       const res = await api.get('/opportunities');
-      return res.data || [];
+      return res.data;
     },
   });
+
+  const opportunities: any[] = Array.isArray(rawData)
+    ? rawData
+    : Array.isArray(rawData?.opportunities)
+    ? rawData.opportunities
+    : [];
 
   return (
     <div className="space-y-6">
@@ -26,7 +32,7 @@ export default function AdminOpportunitiesPage() {
       </div>
 
       <div className="space-y-3">
-        {opportunities?.map((op: any) => (
+        {opportunities.map((op: any) => (
           <div key={op.id} className="p-5 rounded-2xl border flex justify-between items-center" style={{ background: 'var(--surface-0)', borderColor: 'var(--border-subtle)' }}>
             <div>
               <h3 className="font-bold text-base" style={{ color: 'var(--text-primary)' }}>{op.title}</h3>

@@ -20,6 +20,7 @@ import { RecommendationsModule } from './recommendations/recommendations.module'
 import { AnalyticsModule } from './analytics/analytics.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { DocumentsModule } from './documents/documents.module';
+import { InternshipsModule } from './internships/internships.module';
 import { AdminModule } from './admin/admin.module';
 import { HealthModule } from './health/health.module';
 
@@ -63,6 +64,7 @@ import { HealthModule } from './health/health.module';
     AnalyticsModule,
     NotificationsModule,
     DocumentsModule,
+    InternshipsModule,
     AdminModule,
     HealthModule,
   ],

@@ -21,6 +21,7 @@ import { api } from '@/lib/api';
 import { OpportunityCard } from '@/components/ui/opportunity-card';
 import { Button } from '@/components/ui/button';
 import { useApplicationsStore } from '@/store/applications.store';
+import { useOpportunitiesStore } from '@/store/opportunities.store';
 
 type OpportunityType = 'INTERNSHIP' | 'JOB' | 'LIVE_PROJECT' | 'WORKSHOP' | 'MENTORSHIP' | 'APPRENTICESHIP';
 type WorkMode = 'ONSITE' | 'REMOTE' | 'HYBRID';
@@ -210,8 +211,15 @@ export default function OpportunitiesPage() {
     }
   };
 
-  const rawOpportunities: Opportunity[] = data?.opportunities && data.opportunities.length > 0 ? data.opportunities : DEMO_OPPORTUNITIES;
-  
+  const { opportunities: storeOpps } = useOpportunitiesStore();
+
+  const rawOpportunities: Opportunity[] = Array.from(
+    new Map([
+      ...storeOpps.map((o) => [o.id, o as unknown as Opportunity]),
+      ...((data?.opportunities && data.opportunities.length > 0 ? data.opportunities : DEMO_OPPORTUNITIES) as Opportunity[]).map((o) => [o.id, o]),
+    ]).values()
+  );
+
   const opportunities = rawOpportunities.filter((opp) => {
     if (typeFilter && opp.type !== typeFilter) return false;
     if (modeFilter && opp.workMode !== modeFilter) return false;
